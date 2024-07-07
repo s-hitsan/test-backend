@@ -1,31 +1,44 @@
-import express from 'express';
-const app = express()
+import express, {Response} from 'express';
+import {RequestWithBody, RequestWithParams, RequestWithParamsAndBody, RequestWithQuery} from "./types";
+import {CreateUserModel, UpdateUserModel, GetUserQueryModel, DeleteUserModel, UserViewModel} from "./models";
+import {URIParamUserIdModel} from "./models/URIParamsUserIdModel";
+export const app = express()
 const port = process.env.PORT || 3000;
-const HTTP_REQUESTS = {
+export const HTTP_REQUESTS = {
     OK_200: 200,
-
 }
 
 const jsonMiddleware = express.json();
 app.use(jsonMiddleware)
 
-const db = {
+type UserType = {
+    id: number;
+    name: string;
+    email: string;
+}
+
+const db: {users: UserType[]} = {
     users:[{id: 1, name: 'John', email: 'john@gmail.com'},
     {id: 2, name: 'Max', email: 'john@gmail.com'},
     {id: 3, name: 'Week', email: 'john@gmail.com'},
     {id: 4, name: 'Lock', email: 'john@gmail.com'},
 ]};
 
-app.get('/users', (req, res) => {
+app.get('/users', (req: RequestWithQuery<GetUserQueryModel>, res: Response<UserViewModel[]>) => {
     let foundUsers = db.users;
-    if(req?.query?.title){
+    if(req.query.name){
         foundUsers = db.users.filter((user) => user.name.
-        indexOf(req?.query?.title as string) > -1);
+        indexOf(req.query.name as string) > -1);
     }
     res.json(foundUsers)
 })
 
-app.get('/users/:id', (req, res) => {
+app.delete('/__test__/data', (req, res) => {
+    db.users = [];
+    res.sendStatus(200);
+})
+
+app.get('/users/:id', (req: RequestWithParams<URIParamUserIdModel>, res) => {
 
     const foundUser = db.users.find((user) => user.id === +req.params.id)
     if(!foundUser) {
@@ -35,9 +48,9 @@ app.get('/users/:id', (req, res) => {
     res.json(foundUser)
 })
 
-app.post('/users', (req, res) => {
+app.post('/users', (req: RequestWithBody<CreateUserModel>, res: Response<UserViewModel>) => {
     if(!req.body.name) {
-        res.sendStatus(404)
+        res.sendStatus(401)
         return;
     }
 
@@ -47,13 +60,13 @@ app.post('/users', (req, res) => {
     res.json(newUser);
 });
 
-app.delete('/users/:id', (req, res) => {
+app.delete('/users/:id', (req: RequestWithParams<DeleteUserModel>, res) => {
     db.users = db.users.filter((user) => user.id !== +req.params.id)
 
     res.sendStatus(204)
 });
 
-app.put('/users/:id', (req, res) => {
+app.put('/users/:id', (req: RequestWithParamsAndBody<URIParamUserIdModel, UpdateUserModel>, res: Response<UserViewModel>) => {
     if(!req.body.name) {
         res.sendStatus(400)
         return;
