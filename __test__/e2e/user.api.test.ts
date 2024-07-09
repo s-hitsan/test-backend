@@ -15,7 +15,7 @@ describe('/users', () => {
   });
 
   it('should not create user with incorrect data', async () => {
-    await request(app).post('/users').send({ name: '' }).expect(401);
+    await request(app).post('/users').send({ name: '' }).expect(400);
     await request(app).get('/users').expect(200, []);
   });
 
