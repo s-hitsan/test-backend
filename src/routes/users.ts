@@ -14,6 +14,8 @@ import {
   UserViewModel,
 } from '../models';
 import { usersRepository } from '../repositories/users-repository';
+import { body } from 'express-validator';
+import { inputValidationMiddleware } from '../middlewares';
 
 export const getUsersRouter = () => {
   const router = Router();
@@ -29,17 +31,19 @@ export const getUsersRouter = () => {
     },
   );
 
+  const nameValidation = body('name')
+    .notEmpty({ ignore_whitespace: true })
+    .withMessage('Name is required');
+
   router.post(
     '/',
+    nameValidation,
+    body('email').isEmail().withMessage('Wrong email address'),
+    inputValidationMiddleware,
     (
       req: RequestWithBody<CreateUserModel>,
-      res: Response<UserViewModel | { message: string }>,
+      res: Response<UserViewModel | { message: string | {} }>,
     ) => {
-      if (!req.body?.name?.trim()) {
-        res.status(400).json({ message: 'Username cannot be empty' });
-        return;
-      }
-
       const newUser = usersRepository.addUser(req.body);
       res.status(201).json(newUser);
     },
@@ -47,14 +51,12 @@ export const getUsersRouter = () => {
 
   router.put(
     '/:id',
+    nameValidation,
+    inputValidationMiddleware,
     (
       req: RequestWithParamsAndBody<URIParamUserIdModel, UpdateUserModel>,
-      res: Response<UserViewModel>,
+      res: Response<UserViewModel | { message: string | {} }>,
     ) => {
-      if (!req.body.name) {
-        res.sendStatus(400);
-        return;
-      }
       const foundUser = usersRepository.findUserById(+req.params.id);
 
       if (!foundUser) {
