@@ -1,3 +1,3 @@
 export type UpdateUserModel = {
-    name: string;
-}
+  name: string;
+};
