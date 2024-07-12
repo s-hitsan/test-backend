@@ -9,4 +9,4 @@ export const app = express();
 app.use(bodyParser.json());
 
 app.use('/users', getUsersRouter());
-app.use('/__test__', getTestsRouter());
+app.use('/test', getTestsRouter());
