@@ -22,11 +22,8 @@ export const getUsersRouter = () => {
 
   router.get(
     '/',
-    (
-      req: RequestWithQuery<GetUserQueryModel>,
-      res: Response<UserViewModel[]>,
-    ) => {
-      const foundUsers = usersRepository.getUsers(req.query.name);
+    async (req: RequestWithQuery<GetUserQueryModel>, res: Response<UserViewModel[]>) => {
+      const foundUsers = await usersRepository.getUsers(req.query.name);
       res.json(foundUsers);
     },
   );
@@ -40,11 +37,11 @@ export const getUsersRouter = () => {
     nameValidation,
     body('email').isEmail().withMessage('Wrong email address'),
     inputValidationMiddleware,
-    (
+    async (
       req: RequestWithBody<CreateUserModel>,
       res: Response<UserViewModel | { message: string | {} }>,
     ) => {
-      const newUser = usersRepository.addUser(req.body);
+      const newUser = await usersRepository.addUser(req.body);
       res.status(201).json(newUser);
     },
   );
@@ -53,24 +50,24 @@ export const getUsersRouter = () => {
     '/:id',
     nameValidation,
     inputValidationMiddleware,
-    (
+    async (
       req: RequestWithParamsAndBody<URIParamUserIdModel, UpdateUserModel>,
       res: Response<UserViewModel | { message: string | {} }>,
     ) => {
-      const foundUser = usersRepository.findUserById(+req.params.id);
+      const foundUser = await usersRepository.findUserById(+req.params.id);
 
       if (!foundUser) {
         res.sendStatus(404);
         return;
       }
-      usersRepository.setUserName(+req.params.id, req.body.name);
+      await usersRepository.setUserName(+req.params.id, req.body.name);
 
-      res.json(foundUser);
+      res.sendStatus(201);
     },
   );
 
-  router.get('/:id', (req: RequestWithParams<URIParamUserIdModel>, res) => {
-    const foundUser = usersRepository.findUserById(+req.params.id);
+  router.get('/:id', async (req: RequestWithParams<URIParamUserIdModel>, res) => {
+    const foundUser = await usersRepository.findUserById(+req.params.id);
     if (!foundUser) {
       res.sendStatus(404);
       return;
@@ -78,8 +75,8 @@ export const getUsersRouter = () => {
     res.json(foundUser);
   });
 
-  router.delete('/:id', (req: RequestWithParams<DeleteUserModel>, res) => {
-    usersRepository.deleteUser(+req.params.id);
+  router.delete('/:id', async (req: RequestWithParams<DeleteUserModel>, res) => {
+    await usersRepository.deleteUser(+req.params.id);
 
     res.sendStatus(204);
   });

@@ -1,44 +1,33 @@
-export type UserType = {
-  id: number;
-  name: string;
-  email: string;
-};
-export type DbType = { users: UserType[] };
-
-const db: DbType = {
-  users: [
-    { id: 1, name: 'John', email: 'john@gmail.com' },
-    { id: 2, name: 'Max', email: 'john@gmail.com' },
-    { id: 3, name: 'Week', email: 'john@gmail.com' },
-    { id: 4, name: 'Lock', email: 'john@gmail.com' },
-  ],
-};
+import { usersCollection, UserType } from './db';
 
 export const usersRepository = {
-  getUsers(term?: string) {
-    if (!term) {
-      return db.users;
+  async getUsers(term?: string): Promise<UserType[]> {
+    let filter: any = {};
+
+    if (term) {
+      filter = { title: { $regex: term } };
     }
-    return db.users.filter((user) => user.name.indexOf(term as string) > -1);
+    return await usersCollection.find(filter).toArray();
   },
-  addUser(user: Omit<UserType, 'id'>) {
-    const newUser = { id: +new Date(), ...user };
-    db.users.push(newUser);
+  async addUser(user: Omit<UserType, 'id'>): Promise<UserType> {
+    const newUser = { id: +new Date(), email: user.email, name: user.name };
+    await usersCollection.insertOne(newUser);
     return newUser;
   },
-  findUserById(id: number) {
-    return db.users.find((user) => user.id === id);
+  async findUserById(id: number) {
+    const user = await usersCollection.findOne({ id: id });
+    if (user) return user;
+    return null;
   },
-  deleteUser(id: number) {
-    db.users = db.users.filter((user) => user.id !== id);
+  async deleteUser(id: number) {
+    const result = await usersCollection.deleteOne({ id });
+    return result.deletedCount === 1;
   },
-  setUserName(id: number, name: string) {
-    const foundUser = db.users.find((user) => user.id === id);
-    if (foundUser) {
-      foundUser.name = name;
-    }
+  async setUserName(id: number, name: string) {
+    const result = await usersCollection.updateOne({ id }, { $set: { name } });
+    return result.matchedCount === 1;
   },
-  clearUsers() {
-    db.users = [];
+  async clearUsers() {
+    await usersCollection.deleteMany({});
   },
 };

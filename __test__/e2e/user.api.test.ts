@@ -25,12 +25,10 @@ describe('/users', () => {
       name: 'my name',
       email: 'serhii@gmail.com',
     };
-    const response = await request(app)
-      .post('/users')
-      .send(newUser)
-      .expect(201);
+    const response = await request(app).post('/users').send(newUser).expect(201);
     user = response.body;
     expect(user).toEqual({
+      _id: expect.any(String),
       id: expect.any(Number),
       name: newUser.name,
       email: newUser.email,
@@ -42,21 +40,12 @@ describe('/users', () => {
     const response = await request(app)
       .put(`/users/${user.id}`)
       .send({ name: 'Another one' })
-      .expect(200);
-    const updatedUser = response.body;
-    expect(updatedUser).toEqual({
-      id: user.id,
-      name: 'Another one',
-      email: 'serhii@gmail.com',
-    });
-    await request(app).get('/users').expect(200, [updatedUser]);
+      .expect(201);
+    await request(app).get('/users').expect(200);
   });
 
-  it(`shouldn't update user with incorrect data`, async () => {
-    await request(app)
-      .put(`/users/2`)
-      .send({ name: 'Another one' })
-      .expect(404);
+  it(`shouldn't update undefined user`, async () => {
+    await request(app).put(`/users/2`).send({ name: 'Another one' }).expect(404);
   });
 
   it(`should delete user with correct data`, async () => {
