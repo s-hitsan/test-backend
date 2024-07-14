@@ -14,6 +14,9 @@ export const usersRepository = {
       .limit(limit || 10)
       .toArray();
   },
+  async getUsersTotalCount(): Promise<number> {
+    return await usersCollection.countDocuments();
+  },
   async findUserById(id: number) {
     return await usersCollection.findOne({ id: id });
   },

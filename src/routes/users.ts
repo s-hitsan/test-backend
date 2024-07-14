@@ -17,6 +17,7 @@ import { usersService } from '../domain/users-service';
 import { body } from 'express-validator';
 import { inputValidationMiddleware } from '../middlewares';
 import { HTTP_REQUESTS } from '../constants';
+import { usersRepository } from '../repositories/users-repository';
 
 export const getUsersRouter = () => {
   const router = Router();
@@ -28,6 +29,11 @@ export const getUsersRouter = () => {
       res.json(foundUsers);
     },
   );
+
+  router.get('/total-count', async (req, res: Response<number>) => {
+    const usersTotalCount = await usersRepository.getUsersTotalCount();
+    res.json(usersTotalCount);
+  });
 
   const nameValidation = body('name')
     .notEmpty({ ignore_whitespace: true })
