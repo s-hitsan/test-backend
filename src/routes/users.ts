@@ -24,7 +24,7 @@ export const getUsersRouter = () => {
   router.get(
     '/',
     async (req: RequestWithQuery<GetUserQueryModel>, res: Response<UserViewModel[]>) => {
-      const foundUsers = await usersService.getUsers(req.query.name);
+      const foundUsers = await usersService.getUsers(req.query.name, req.query.skip);
       res.json(foundUsers);
     },
   );

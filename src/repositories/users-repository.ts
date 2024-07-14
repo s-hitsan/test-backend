@@ -2,13 +2,17 @@ import { usersCollection, UserType } from './db';
 import { InsertOneResult } from 'mongodb';
 
 export const usersRepository = {
-  async getUsers(term?: string): Promise<UserType[]> {
+  async getUsers(term?: string, skip?: number, limit?: number): Promise<UserType[]> {
     let filter: any = {};
 
     if (term) {
       filter = { title: { $regex: term } };
     }
-    return await usersCollection.find(filter).toArray();
+    return await usersCollection
+      .find(filter)
+      .skip(skip || 0)
+      .limit(limit || 10)
+      .toArray();
   },
   async findUserById(id: number) {
     return await usersCollection.findOne({ id: id });
