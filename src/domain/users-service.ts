@@ -3,7 +3,7 @@ import { UserType } from '../repositories/db';
 
 export const usersService = {
   async getUsers(term?: string, skip?: string): Promise<UserType[]> {
-    return await usersRepository.getUsers(term, Number(skip), 10);
+    return await usersRepository.getUsers(term, skip ? +skip : 0, 10);
   },
   async findUserById(id: number) {
     return await usersRepository.findUserById(id);
