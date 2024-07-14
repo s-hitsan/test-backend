@@ -1,4 +1,5 @@
 import { usersCollection, UserType } from './db';
+import { InsertOneResult } from 'mongodb';
 
 export const usersRepository = {
   async getUsers(term?: string): Promise<UserType[]> {
@@ -9,15 +10,11 @@ export const usersRepository = {
     }
     return await usersCollection.find(filter).toArray();
   },
-  async addUser(user: Omit<UserType, 'id'>): Promise<UserType> {
-    const newUser = { id: +new Date(), email: user.email, name: user.name };
-    await usersCollection.insertOne(newUser);
-    return newUser;
-  },
   async findUserById(id: number) {
-    const user = await usersCollection.findOne({ id: id });
-    if (user) return user;
-    return null;
+    return await usersCollection.findOne({ id: id });
+  },
+  async addUser(user: UserType): Promise<InsertOneResult<UserType>> {
+    return await usersCollection.insertOne(user);
   },
   async deleteUser(id: number) {
     const result = await usersCollection.deleteOne({ id });

@@ -1,4 +1,5 @@
 export const HTTP_REQUESTS = {
   OK_200: 200,
+  BAD_REQUEST_400: 400,
   NO_CONTENT: 404,
 };
