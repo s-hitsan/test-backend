@@ -35,7 +35,7 @@ export const getAidsRouter = () => {
     res.json(aidsTotalCount);
   });
 
-  const aidValidation = body(['title', 'description', 'sum'])
+  const aidValidation = body(['title', 'description', 'sum', 'link'])
     .notEmpty({ ignore_whitespace: true })
     .withMessage('Fields are required');
 
