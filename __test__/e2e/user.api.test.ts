@@ -1,5 +1,5 @@
 import request from 'supertest';
-import { CreateUserModel } from '../../src/models';
+import { CreateUserModel } from '../../src/models/users';
 import { app } from '../../src/app';
 
 describe('/users', () => {

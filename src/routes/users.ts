@@ -12,7 +12,7 @@ import {
   UpdateUserModel,
   URIParamUserIdModel,
   UserViewModel,
-} from '../models';
+} from '../models/users';
 import { usersService } from '../domain/users-service';
 import { body } from 'express-validator';
 import { inputValidationMiddleware } from '../middlewares';
