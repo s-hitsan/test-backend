@@ -12,6 +12,7 @@ export const aidsRepository = {
       .find(filter)
       .skip(skip || 0)
       .limit(limit || 10)
+      .sort({ _id: -1 })
       .toArray();
   },
   async getAidsTotalCount(): Promise<number> {
