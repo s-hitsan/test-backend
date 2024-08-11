@@ -1,15 +1,15 @@
-import { aidsCollection, AidType } from './db';
+import { AidListType, aidsCollection, FullAidType } from './db';
 import { InsertOneResult } from 'mongodb';
 
 export const aidsRepository = {
-  async getAids(term?: string, skip?: number, limit?: number): Promise<AidType[]> {
+  async getAids(term?: string, skip?: number, limit?: number): Promise<AidListType[]> {
     let filter: any = {};
 
     if (term) {
       filter = { title: { $regex: term } };
     }
     return await aidsCollection
-      .find(filter)
+      .find(filter, { projection: { title: 1, description: 1, sum: 1, id: 1 } })
       .skip(skip || 0)
       .limit(limit || 10)
       .sort({ _id: -1 })
@@ -21,7 +21,7 @@ export const aidsRepository = {
   async findAidById(id: number) {
     return await aidsCollection.findOne({ id: id });
   },
-  async addAid(aid: AidType): Promise<InsertOneResult<AidType>> {
+  async addAid(aid: FullAidType): Promise<InsertOneResult<FullAidType>> {
     return await aidsCollection.insertOne(aid);
   },
   async deleteAid(id: number) {
